@@ -163,7 +163,7 @@ export default function DashboardPage() {
             }}>
               {prizes.map(prize => (
                 <Link key={prize.id}
-                  href={`/quick-deposit?amount=${prize.card_amount}&prize=${encodeURIComponent(prize.prize_description)}`}
+                  href={`/card?id=${prize.id}`}
                   style={{ textDecoration: 'none' }}
                 >
                   <div style={{
