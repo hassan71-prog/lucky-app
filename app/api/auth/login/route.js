@@ -51,13 +51,15 @@ export async function POST(request) {
       httpOnly: true, 
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
-      sameSite: 'lax'
+      sameSite: 'none',
+      secure: true
     });
     cookieStore.set('user_name', user.name, { 
       httpOnly: true, 
       maxAge: 60 * 60 * 24 * 7,
       path: '/',
-      sameSite: 'lax'
+      sameSite: 'none',
+      secure: true
     });
 
     return new Response(JSON.stringify({ success: true }), {
