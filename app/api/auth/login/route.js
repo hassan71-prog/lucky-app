@@ -6,16 +6,30 @@ const sql = neon(process.env.POSTGRES_URL);
 
 export async function POST(request) {
   try {
-    const { phone, password } = await request.json();
+    const body = await request.json();
+    const { phone, password } = body;
+
+    if (!phone || !password) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Phone aur password zaroori hain!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     const users = await sql`
       SELECT * FROM users WHERE phone = ${phone}
     `;
 
     if (users.length === 0) {
-      return Response.json({ 
+      return new Response(JSON.stringify({ 
         success: false, 
         message: 'Phone ya password galat hai!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -23,27 +37,41 @@ export async function POST(request) {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return Response.json({ 
+      return new Response(JSON.stringify({ 
         success: false, 
         message: 'Phone ya password galat hai!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
     const cookieStore = await cookies();
     cookieStore.set('user_id', String(user.id), { 
       httpOnly: true, 
-      maxAge: 60 * 60 * 24 * 7 
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      sameSite: 'lax'
     });
     cookieStore.set('user_name', user.name, { 
       httpOnly: true, 
-      maxAge: 60 * 60 * 24 * 7 
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+      sameSite: 'lax'
     });
 
-    return Response.json({ success: true });
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
   } catch (error) {
-    return Response.json({ 
+    return new Response(JSON.stringify({ 
       success: false, 
       message: error.message 
-    }, { status: 500 });
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
