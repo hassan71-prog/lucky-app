@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const [referral, setReferral] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [whatsapp, setWhatsapp] = useState('');
 
   useEffect(() => {
     fetchDashboard();
