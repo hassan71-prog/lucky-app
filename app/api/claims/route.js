@@ -9,9 +9,12 @@ export async function POST(request) {
     const userId = cookieStore.get('user_id')?.value;
 
     if (!userId) {
-      return Response.json({ 
+      return new Response(JSON.stringify({ 
         success: false, 
         message: 'Login karein!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -24,9 +27,12 @@ export async function POST(request) {
     `;
 
     if (existing.length > 0) {
-      return Response.json({ 
+      return new Response(JSON.stringify({ 
         success: false, 
         message: 'Aap pehle se claim kar chuke hain!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -35,16 +41,22 @@ export async function POST(request) {
       VALUES (${userId}, ${prize_id}, ${account_name}, ${account_number}, ${id_card}, ${payment_method})
     `;
 
-    return Response.json({ 
+    return new Response(JSON.stringify({ 
       success: true, 
       message: 'Claim submit ho gaya! Admin jald payment karega.' 
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    return Response.json({ 
+    return new Response(JSON.stringify({ 
       success: false, 
       message: error.message 
-    }, { status: 500 });
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
@@ -54,9 +66,12 @@ export async function GET() {
     const adminId = cookieStore.get('admin_id')?.value;
 
     if (!adminId) {
-      return Response.json({ 
+      return new Response(JSON.stringify({ 
         success: false, 
         message: 'Admin login karein!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -69,12 +84,18 @@ export async function GET() {
       ORDER BY c.created_at DESC
     `;
 
-    return Response.json({ success: true, claims });
+    return new Response(JSON.stringify({ success: true, claims }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
-    return Response.json({ 
+    return new Response(JSON.stringify({ 
       success: false, 
       message: error.message 
-    }, { status: 500 });
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
