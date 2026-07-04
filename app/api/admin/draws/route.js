@@ -30,17 +30,20 @@ export async function POST(request) {
     const adminId = cookieStore.get('admin_id')?.value;
     if (!adminId) return Response.json({ success: false });
 
-    const { type, title, draw_date, draw_id, card_amount, prize_description } = await request.json();
+    const body = await request.json();
+    const { type } = body;
 
     if (type === 'draw') {
+      const { title, draw_date } = body;
       await sql`
         INSERT INTO draws (title, draw_date, status)
         VALUES (${title}, ${draw_date}, 'active')
       `;
     } else if (type === 'prize') {
+      const { draw_id, card_amount, prize_description, prize_image, description } = body;
       await sql`
-        INSERT INTO prizes (draw_id, card_amount, prize_description)
-        VALUES (${draw_id}, ${card_amount}, ${prize_description})
+        INSERT INTO prizes (draw_id, card_amount, prize_description, prize_image, description)
+        VALUES (${draw_id}, ${card_amount}, ${prize_description}, ${prize_image || ''}, ${description || ''})
       `;
     }
 

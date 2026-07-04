@@ -18,6 +18,8 @@ export default function AdminDraws() {
   const [drawId, setDrawId] = useState('');
   const [cardAmount, setCardAmount] = useState('');
   const [prizeDesc, setPrizeDesc] = useState('');
+  const [prizeImage, setPrizeImage] = useState('');
+  const [description, setDescription] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -26,15 +28,18 @@ export default function AdminDraws() {
   const fetchData = async () => {
     const res = await fetch('/api/admin/draws');
     const data = await res.json();
-
-    if (!data.success) {
-      router.push('/admin');
-      return;
-    }
-
+    if (!data.success) { router.push('/admin'); return; }
     setDraws(data.draws);
     setPrizes(data.prizes);
     setLoading(false);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setPrizeImage(reader.result);
+    reader.readAsDataURL(file);
   };
 
   const handleCreateDraw = async (e) => {
@@ -47,8 +52,7 @@ export default function AdminDraws() {
     const data = await res.json();
     if (data.success) {
       setMsg('✅ Draw ban gaya!');
-      setTitle('');
-      setDrawDate('');
+      setTitle(''); setDrawDate('');
       fetchData();
     }
   };
@@ -62,15 +66,17 @@ export default function AdminDraws() {
         type: 'prize', 
         draw_id: drawId, 
         card_amount: cardAmount, 
-        prize_description: prizeDesc 
+        prize_description: prizeDesc,
+        prize_image: prizeImage,
+        description: description
       }),
     });
     const data = await res.json();
     if (data.success) {
       setMsg('✅ Prize add ho gaya!');
-      setDrawId('');
-      setCardAmount('');
-      setPrizeDesc('');
+      setDrawId(''); setCardAmount('');
+      setPrizeDesc(''); setPrizeImage('');
+      setDescription('');
       fetchData();
     }
   };
@@ -85,13 +91,7 @@ export default function AdminDraws() {
   };
 
   if (loading) return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#f0eaff',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
+    <div style={{ minHeight: '100vh', background: '#f0eaff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <h2 style={{ color: '#6c3fc5' }}>Loading... 🍀</h2>
     </div>
   );
@@ -102,15 +102,7 @@ export default function AdminDraws() {
     <div style={{ background: '#f0eaff', minHeight: '100vh' }}>
 
       {/* Nav */}
-      <div style={{
-        background: '#4a2a9e',
-        padding: '15px 20px',
-        color: '#fff',
-        display: 'flex',
-        gap: '20px',
-        flexWrap: 'wrap',
-        alignItems: 'center'
-      }}>
+      <div style={{ background: '#4a2a9e', padding: '15px 20px', color: '#fff', display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
         <strong>🍀 Admin Panel</strong>
         <Link href="/admin/dashboard" style={{ color: '#ffd700' }}>🏠 Dashboard</Link>
         <Link href="/admin/deposits" style={{ color: '#ffd700' }}>💳 Deposits</Link>
@@ -123,17 +115,13 @@ export default function AdminDraws() {
         <h2 style={{ margin: '20px 0' }}>🎯 Draws Manage Karein</h2>
 
         {msg && (
-          <div style={{
-            background: '#d1e7dd', color: '#0a3622',
-            padding: '12px', borderRadius: '8px', marginBottom: '15px'
-          }}>{msg}</div>
+          <div style={{ background: '#d1e7dd', color: '#0a3622', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
+            {msg}
+          </div>
         )}
 
         {/* Naya Draw */}
-        <div style={{
-          background: '#fff', padding: '20px',
-          borderRadius: '12px', marginBottom: '20px'
-        }}>
+        <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
           <h3>➕ Naya Draw Banayein</h3>
           <form onSubmit={handleCreateDraw}>
             <input
@@ -142,12 +130,7 @@ export default function AdminDraws() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '12px',
-                margin: '8px 0', border: '1px solid #ddd',
-                borderRadius: '8px', fontSize: '1em',
-                boxSizing: 'border-box'
-              }}
+              style={{ width: '100%', padding: '12px', margin: '8px 0', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em', boxSizing: 'border-box' }}
             />
             <label style={{ fontWeight: 'bold' }}>Draw ki Tarikh:</label>
             <input
@@ -155,28 +138,16 @@ export default function AdminDraws() {
               value={drawDate}
               onChange={(e) => setDrawDate(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '12px',
-                margin: '8px 0 16px', border: '1px solid #ddd',
-                borderRadius: '8px', fontSize: '1em',
-                boxSizing: 'border-box'
-              }}
+              style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em', boxSizing: 'border-box' }}
             />
-            <button type="submit" style={{
-              background: '#6c3fc5', color: '#fff',
-              padding: '12px 24px', borderRadius: '10px',
-              border: 'none', cursor: 'pointer', fontSize: '1em'
-            }}>
+            <button type="submit" style={{ background: '#6c3fc5', color: '#fff', padding: '12px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '1em' }}>
               Draw Banao
             </button>
           </form>
         </div>
 
         {/* Prize Add */}
-        <div style={{
-          background: '#fff', padding: '20px',
-          borderRadius: '12px', marginBottom: '20px'
-        }}>
+        <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
           <h3>🎁 Prize Add Karein</h3>
           <form onSubmit={handleAddPrize}>
             <label style={{ fontWeight: 'bold' }}>Draw Select Karein:</label>
@@ -184,11 +155,7 @@ export default function AdminDraws() {
               value={drawId}
               onChange={(e) => setDrawId(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '12px',
-                margin: '8px 0 16px', border: '1px solid #ddd',
-                borderRadius: '8px', fontSize: '1em'
-              }}
+              style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em' }}
             >
               <option value="">-- Draw Select Karein --</option>
               {activeDraws.map(d => (
@@ -201,55 +168,57 @@ export default function AdminDraws() {
               value={cardAmount}
               onChange={(e) => setCardAmount(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '12px',
-                margin: '8px 0 16px', border: '1px solid #ddd',
-                borderRadius: '8px', fontSize: '1em'
-              }}
+              style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em' }}
             >
               <option value="">-- Amount Select Karein --</option>
-              <option value="5">Rs. 5</option>
               <option value="10">Rs. 10</option>
               <option value="20">Rs. 20</option>
               <option value="50">Rs. 50</option>
               <option value="100">Rs. 100</option>
             </select>
 
+            <label style={{ fontWeight: 'bold' }}>Prize ka Naam:</label>
             <input
               type="text"
               placeholder="Prize (Mobile Phone, Rs. 1000 Cash)"
               value={prizeDesc}
               onChange={(e) => setPrizeDesc(e.target.value)}
               required
-              style={{
-                width: '100%', padding: '12px',
-                margin: '8px 0 16px', border: '1px solid #ddd',
-                borderRadius: '8px', fontSize: '1em',
-                boxSizing: 'border-box'
-              }}
+              style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em', boxSizing: 'border-box' }}
             />
-            <button type="submit" style={{
-              background: '#6c3fc5', color: '#fff',
-              padding: '12px 24px', borderRadius: '10px',
-              border: 'none', cursor: 'pointer', fontSize: '1em'
-            }}>
+
+            <label style={{ fontWeight: 'bold' }}>Prize ki Description:</label>
+            <textarea
+              placeholder="Prize ke baare mein detail likhein..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em', boxSizing: 'border-box' }}
+            />
+
+            <label style={{ fontWeight: 'bold' }}>Prize ki Photo:</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ width: '100%', padding: '10px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px' }}
+            />
+
+            {prizeImage && (
+              <img src={prizeImage} alt="preview"
+                style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '16px' }}
+              />
+            )}
+
+            <button type="submit" style={{ background: '#6c3fc5', color: '#fff', padding: '12px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '1em' }}>
               🎁 Prize Add Karein
             </button>
           </form>
         </div>
 
         {/* Draws List */}
-        <h3 style={{
-          color: '#6c3fc5',
-          borderLeft: '4px solid #6c3fc5',
-          paddingLeft: '10px',
-          marginBottom: '15px'
-        }}>📋 Sare Draws</h3>
-        <table style={{
-          width: '100%', borderCollapse: 'collapse',
-          background: '#fff', borderRadius: '10px',
-          overflow: 'hidden', marginBottom: '20px'
-        }}>
+        <h3 style={{ color: '#6c3fc5', borderLeft: '4px solid #6c3fc5', paddingLeft: '10px', marginBottom: '15px' }}>📋 Sare Draws</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: '10px', overflow: 'hidden', marginBottom: '20px' }}>
           <thead>
             <tr style={{ background: '#6c3fc5', color: '#fff' }}>
               <th style={{ padding: '12px' }}>Draw</th>
@@ -262,42 +231,19 @@ export default function AdminDraws() {
             {draws.map(d => (
               <tr key={d.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={{ padding: '10px', textAlign: 'center' }}>{d.title}</td>
-                <td style={{ padding: '10px', textAlign: 'center' }}>
-                  {new Date(d.draw_date).toLocaleDateString()}
-                </td>
+                <td style={{ padding: '10px', textAlign: 'center' }}>{new Date(d.draw_date).toLocaleDateString()}</td>
                 <td style={{ padding: '10px', textAlign: 'center' }}>
                   <span style={{
-                    padding: '4px 10px', borderRadius: '20px',
-                    fontSize: '0.8em', fontWeight: 'bold',
-                    background: d.status === 'active' ? '#d1e7dd' :
-                      d.status === 'completed' ? '#f8d7da' : '#fff3cd',
-                    color: d.status === 'active' ? '#0a3622' :
-                      d.status === 'completed' ? '#842029' : '#856404'
-                  }}>
-                    {d.status}
-                  </span>
+                    padding: '4px 10px', borderRadius: '20px', fontSize: '0.8em', fontWeight: 'bold',
+                    background: d.status === 'active' ? '#d1e7dd' : d.status === 'completed' ? '#f8d7da' : '#fff3cd',
+                    color: d.status === 'active' ? '#0a3622' : d.status === 'completed' ? '#842029' : '#856404'
+                  }}>{d.status}</span>
                 </td>
                 <td style={{ padding: '10px', textAlign: 'center' }}>
                   {d.status === 'active' && (
-                    <button
-                      onClick={() => handleStatusChange(d.id, 'completed')}
-                      style={{
-                        background: '#dc3545', color: '#fff',
-                        padding: '5px 12px', borderRadius: '6px',
-                        border: 'none', cursor: 'pointer'
-                      }}>
+                    <button onClick={() => handleStatusChange(d.id, 'completed')}
+                      style={{ background: '#dc3545', color: '#fff', padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>
                       Complete Karein
-                    </button>
-                  )}
-                  {d.status === 'upcoming' && (
-                    <button
-                      onClick={() => handleStatusChange(d.id, 'active')}
-                      style={{
-                        background: '#198754', color: '#fff',
-                        padding: '5px 12px', borderRadius: '6px',
-                        border: 'none', cursor: 'pointer'
-                      }}>
-                      Active Karein
                     </button>
                   )}
                 </td>
@@ -307,50 +253,30 @@ export default function AdminDraws() {
         </table>
 
         {/* Prizes List */}
-        <h3 style={{
-          color: '#6c3fc5',
-          borderLeft: '4px solid #6c3fc5',
-          paddingLeft: '10px',
-          marginBottom: '15px'
-        }}>🎁 Sare Prizes</h3>
-        <table style={{
-          width: '100%', borderCollapse: 'collapse',
-          background: '#fff', borderRadius: '10px',
-          overflow: 'hidden'
-        }}>
-          <thead>
-            <tr style={{ background: '#6c3fc5', color: '#fff' }}>
-              <th style={{ padding: '12px' }}>Draw</th>
-              <th style={{ padding: '12px' }}>Card Amount</th>
-              <th style={{ padding: '12px' }}>Prize</th>
-              <th style={{ padding: '12px' }}>Winner</th>
-            </tr>
-          </thead>
-          <tbody>
-            {prizes.map(p => (
-              <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
-                <td style={{ padding: '10px', textAlign: 'center' }}>{p.draw_title}</td>
-                <td style={{ padding: '10px', textAlign: 'center' }}>Rs. {p.card_amount}</td>
-                <td style={{ padding: '10px', textAlign: 'center' }}>{p.prize_description}</td>
-                <td style={{ padding: '10px', textAlign: 'center' }}>
-                  {p.winner_deposit_id ? (
-                    <span style={{
-                      padding: '4px 10px', borderRadius: '20px',
-                      background: '#d1e7dd', color: '#0a3622',
-                      fontSize: '0.8em', fontWeight: 'bold'
-                    }}>✅ Selected</span>
-                  ) : (
-                    <span style={{
-                      padding: '4px 10px', borderRadius: '20px',
-                      background: '#fff3cd', color: '#856404',
-                      fontSize: '0.8em', fontWeight: 'bold'
-                    }}>⏳ Pending</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <h3 style={{ color: '#6c3fc5', borderLeft: '4px solid #6c3fc5', paddingLeft: '10px', marginBottom: '15px' }}>🎁 Sare Prizes</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '15px' }}>
+          {prizes.map(p => (
+            <div key={p.id} style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+              {p.prize_image && (
+                <img src={p.prize_image} alt={p.prize_description}
+                  style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+                />
+              )}
+              <div style={{ padding: '12px' }}>
+                <strong>{p.prize_description}</strong>
+                <p style={{ color: '#6c3fc5', margin: '5px 0' }}>Rs. {p.card_amount} Card</p>
+                {p.description && <p style={{ color: '#666', fontSize: '0.85em' }}>{p.description}</p>}
+                <span style={{
+                  padding: '4px 10px', borderRadius: '20px', fontSize: '0.8em', fontWeight: 'bold',
+                  background: p.winner_deposit_id ? '#d1e7dd' : '#fff3cd',
+                  color: p.winner_deposit_id ? '#0a3622' : '#856404'
+                }}>
+                  {p.winner_deposit_id ? '✅ Winner Selected' : '⏳ Pending'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

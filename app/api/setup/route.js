@@ -1,24 +1,15 @@
-import { createTables } from '@/lib/db';
 import { neon } from '@neondatabase/serverless';
-import bcrypt from 'bcryptjs';
+
+const sql = neon(process.env.POSTGRES_URL);
 
 export async function GET() {
   try {
-    await createTables();
-    
-    // Default admin banana
-    const sql = neon(process.env.POSTGRES_URL);
-    const hashedPassword = await bcrypt.hash('password', 10);
-    
-    await sql`
-      INSERT INTO admins (username, password)
-      VALUES ('admin', ${hashedPassword})
-      ON CONFLICT DO NOTHING
-    `;
+    await sql`ALTER TABLE prizes ADD COLUMN IF NOT EXISTS description TEXT`;
+    await sql`ALTER TABLE prizes ADD COLUMN IF NOT EXISTS prize_image VARCHAR(255)`;
 
     return Response.json({ 
       success: true, 
-      message: 'Tables ban gayi aur admin create ho gaya!' 
+      message: 'Database update ho gaya!' 
     });
   } catch (error) {
     return Response.json({ 
