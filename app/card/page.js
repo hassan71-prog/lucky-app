@@ -15,6 +15,11 @@ function CardContent() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState(1);
+
+  // Apna Easypaisa number yahan likho
+  const easypaisaNumber = "03273003414";
+  const easypaisaLink = `https://easypaisa.com.pk/payment?to=${easypaisaNumber}`;
 
   useEffect(() => {
     fetchPrize();
@@ -23,9 +28,7 @@ function CardContent() {
   const fetchPrize = async () => {
     const res = await fetch(`/api/prize?id=${prizeId}`);
     const data = await res.json();
-    if (data.success) {
-      setPrize(data.prize);
-    }
+    if (data.success) setPrize(data.prize);
     setLoading(false);
   };
 
@@ -40,14 +43,14 @@ function CardContent() {
       body: JSON.stringify({ 
         amount: prize.card_amount, 
         payment_method: method, 
-        transaction_id: txnId 
+        transaction_id: txnId || 'Online Payment'
       }),
     });
 
     const data = await res.json();
 
     if (data.success) {
-      setSuccess('Card submit ho gaya! Admin approve karega. ✅');
+      setSuccess('✅ Card submit ho gaya! Admin approve karega.');
       setTimeout(() => router.push('/dashboard'), 2000);
     } else {
       setError(data.message);
@@ -71,11 +74,7 @@ function CardContent() {
     <div style={{ background: '#f0eaff', minHeight: '100vh' }}>
 
       {/* Header */}
-      <div style={{
-        background: '#6c3fc5', color: '#fff',
-        padding: '15px 20px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-      }}>
+      <div style={{ background: '#6c3fc5', color: '#fff', padding: '15px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>🍀 Lucky Draw</h2>
         <Link href="/dashboard" style={{ color: '#ffd700' }}>← Wapas</Link>
       </div>
@@ -83,25 +82,14 @@ function CardContent() {
       <div style={{ maxWidth: '500px', margin: '0 auto', padding: '20px' }}>
 
         {/* Prize Card */}
-        <div style={{
-          background: '#fff', borderRadius: '16px',
-          overflow: 'hidden', marginBottom: '20px',
-          boxShadow: '0 4px 20px rgba(108,63,197,0.15)',
-          border: '2px solid #e8d5ff'
-        }}>
+        <div style={{ background: '#fff', borderRadius: '16px', overflow: 'hidden', marginBottom: '20px', boxShadow: '0 4px 20px rgba(108,63,197,0.15)', border: '2px solid #e8d5ff' }}>
           {prize.prize_image && (
             <img src={prize.prize_image} alt={prize.prize_description}
-              style={{ width: '100%', height: '250px', objectFit: 'cover' }}
-            />
+              style={{ width: '100%', height: '250px', objectFit: 'cover' }} />
           )}
           <div style={{ padding: '20px' }}>
             <h2 style={{ color: '#6c3fc5' }}>{prize.prize_description}</h2>
-            <div style={{
-              background: '#6c3fc5', color: '#fff',
-              padding: '6px 14px', borderRadius: '20px',
-              display: 'inline-block', margin: '10px 0',
-              fontWeight: 'bold'
-            }}>
+            <div style={{ background: '#6c3fc5', color: '#fff', padding: '6px 14px', borderRadius: '20px', display: 'inline-block', margin: '10px 0', fontWeight: 'bold' }}>
               Rs. {prize.card_amount} Card
             </div>
             {prize.description && (
@@ -112,83 +100,78 @@ function CardContent() {
           </div>
         </div>
 
-        {/* Deposit Form */}
         {success ? (
           <div style={{ background: '#d1e7dd', color: '#0a3622', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
             {success}
           </div>
         ) : (
-          <div style={{ background: '#fff', padding: '20px', borderRadius: '12px' }}>
-            <h3 style={{ marginBottom: '15px' }}>💳 Is Card Mein Participate Karein</h3>
+          <>
+            {/* Step 1: Payment */}
+            {step === 1 && (
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', marginBottom: '15px' }}>
+                <h3 style={{ marginBottom: '15px' }}>💳 Step 1: Payment Karein</h3>
+                <p style={{ color: '#666', marginBottom: '15px' }}>
+                  Rs. <strong>{prize.card_amount}</strong> pay karein:
+                </p>
 
-            {error && (
-              <div style={{ background: '#f8d7da', color: '#842029', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
-                {error}
+                {/* Easypaisa Button */}
+                <a href={easypaisaLink} target="_blank" rel="noreferrer"
+                  style={{ display: 'block', background: '#00a651', color: '#fff', padding: '15px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.1em', marginBottom: '10px' }}>
+                  📱 Easypaisa Se Pay Karein — Rs. {prize.card_amount}
+                </a>
+
+                {/* JazzCash Button */}
+                <a href={`jazz://transfer?to=${easypaisaNumber}&amount=${prize.card_amount}`} target="_blank" rel="noreferrer"
+                  style={{ display: 'block', background: '#db1f29', color: '#fff', padding: '15px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.1em', marginBottom: '15px' }}>
+                  📱 JazzCash Se Pay Karein — Rs. {prize.card_amount}
+                </a>
+
+                <button onClick={() => setStep(2)}
+                  style={{ width: '100%', padding: '13px', background: '#6c3fc5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1em', cursor: 'pointer' }}>
+                  Payment Ho Gayi — Aage Barho ➡️
+                </button>
               </div>
             )}
 
-            <form onSubmit={handleDeposit}>
-              <label style={{ fontWeight: 'bold' }}>Card Amount:</label>
-              <input
-                type="text"
-                value={`Rs. ${prize.card_amount}`}
-                disabled
-                style={{
-                  width: '100%', padding: '12px',
-                  margin: '8px 0 16px', border: '1px solid #ddd',
-                  borderRadius: '8px', fontSize: '1em',
-                  background: '#f0eaff', fontWeight: 'bold',
-                  boxSizing: 'border-box'
-                }}
-              />
+            {/* Step 2: Confirm */}
+            {step === 2 && (
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '12px' }}>
+                <h3 style={{ marginBottom: '15px' }}>✅ Step 2: Confirm Karein</h3>
 
-              <label style={{ fontWeight: 'bold' }}>Payment Method:</label>
-              <select
-                value={method}
-                onChange={(e) => setMethod(e.target.value)}
-                required
-                style={{
-                  width: '100%', padding: '12px',
-                  margin: '8px 0 16px', border: '1px solid #ddd',
-                  borderRadius: '8px', fontSize: '1em'
-                }}
-              >
-                <option value="">-- Select Karein --</option>
-                <option value="easypaisa">Easypaisa</option>
-                <option value="jazzcash">JazzCash</option>
-                <option value="manual">Cash</option>
-              </select>
+                {error && (
+                  <div style={{ background: '#f8d7da', color: '#842029', padding: '12px', borderRadius: '8px', marginBottom: '15px' }}>
+                    {error}
+                  </div>
+                )}
 
-              <label style={{ fontWeight: 'bold' }}>Transaction ID:</label>
-              <input
-                type="text"
-                placeholder="Payment ke baad TXN ID likhein"
-                value={txnId}
-                onChange={(e) => setTxnId(e.target.value)}
-                required
-                style={{
-                  width: '100%', padding: '12px',
-                  margin: '8px 0 16px', border: '1px solid #ddd',
-                  borderRadius: '8px', fontSize: '1em',
-                  boxSizing: 'border-box'
-                }}
-              />
+                <form onSubmit={handleDeposit}>
+                  <label style={{ fontWeight: 'bold' }}>Payment Method:</label>
+                  <select value={method} onChange={(e) => setMethod(e.target.value)} required
+                    style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em' }}>
+                    <option value="">-- Select Karein --</option>
+                    <option value="easypaisa">Easypaisa</option>
+                    <option value="jazzcash">JazzCash</option>
+                  </select>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  width: '100%', padding: '13px',
-                  background: submitting ? '#999' : '#6c3fc5',
-                  color: '#fff', border: 'none',
-                  borderRadius: '8px', fontSize: '1.1em',
-                  cursor: submitting ? 'not-allowed' : 'pointer'
-                }}
-              >
-                {submitting ? 'Submit ho raha hai...' : '🎟️ Participate Karein'}
-              </button>
-            </form>
-          </div>
+                  <label style={{ fontWeight: 'bold' }}>Transaction ID (optional):</label>
+                  <input type="text" placeholder="TXN ID (agar mile to likhein)"
+                    value={txnId} onChange={(e) => setTxnId(e.target.value)}
+                    style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em', boxSizing: 'border-box' }}
+                  />
+
+                  <button type="submit" disabled={submitting}
+                    style={{ width: '100%', padding: '13px', background: submitting ? '#999' : '#6c3fc5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1.1em', cursor: submitting ? 'not-allowed' : 'pointer' }}>
+                    {submitting ? 'Submit ho raha hai...' : '🎟️ Deposit Confirm Karein'}
+                  </button>
+
+                  <button type="button" onClick={() => setStep(1)}
+                    style={{ width: '100%', padding: '12px', background: '#6c757d', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1em', cursor: 'pointer', marginTop: '8px' }}>
+                    ← Wapas
+                  </button>
+                </form>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
