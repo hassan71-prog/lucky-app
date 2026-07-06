@@ -19,7 +19,7 @@ function CardContent() {
 
   // Apna Easypaisa number yahan likho
   const easypaisaNumber = "03273003414";
-  const easypaisaLink = `https://raast.com.pk/pay/${easypaisaNumber}?amount=${prize?.card_amount}`;
+  const easypaisaLink = `intent://send?pa=${easypaisaNumber}&am=${prize?.card_amount}#Intent;scheme=easypaisa;package=com.temenos.easypaisa;end`;
 
   useEffect(() => {
     fetchPrize();
