@@ -19,7 +19,7 @@ function CardContent() {
 
   // Apna Easypaisa number yahan likho
   const easypaisaNumber = "03273003414";
-  const easypaisaLink = `intent://send?pa=${easypaisaNumber}&am=${prize?.card_amount}#Intent;scheme=easypaisa;package=com.temenos.easypaisa;end`;
+  const easypaisaLink = `easypaisa://mobile-account/send-money?msisdn=${easypaisaNumber}&amount=${prize?.card_amount}`;
 
   useEffect(() => {
     fetchPrize();
