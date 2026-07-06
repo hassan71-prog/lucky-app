@@ -19,7 +19,7 @@ function CardContent() {
 
   // Apna Easypaisa number yahan likho
   const easypaisaNumber = "03273003414";
-  const easypaisaLink = `https://easypaisa.com.pk/payment?to=${easypaisaNumber}`;
+  const easypaisaLink = `easypaisa://send?phone=${easypaisaNumber}&amount=${prize?.card_amount}`;
 
   useEffect(() => {
     fetchPrize();
@@ -120,11 +120,7 @@ function CardContent() {
                   📱 Easypaisa Se Pay Karein — Rs. {prize.card_amount}
                 </a>
 
-                {/* JazzCash Button */}
-                <a href={`jazz://transfer?to=${easypaisaNumber}&amount=${prize.card_amount}`} target="_blank" rel="noreferrer"
-                  style={{ display: 'block', background: '#db1f29', color: '#fff', padding: '15px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.1em', marginBottom: '15px' }}>
-                  📱 JazzCash Se Pay Karein — Rs. {prize.card_amount}
-                </a>
+                
 
                 <button onClick={() => setStep(2)}
                   style={{ width: '100%', padding: '13px', background: '#6c3fc5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1em', cursor: 'pointer' }}>
