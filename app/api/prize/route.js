@@ -1,22 +1,21 @@
 import { neon } from '@neondatabase/serverless';
-import { cookies } from 'next/headers';
 
 const sql = neon(process.env.POSTGRES_URL);
 
 export async function GET(request) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('user_id')?.value;
-
-    if (!userId) {
-      return Response.json({ 
-        success: false, 
-        message: 'Login karein!' 
-      });
-    }
-
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+
+    if (!id) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Prize ID nahi mila!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     const prizes = await sql`
       SELECT p.*, d.title as draw_title, d.draw_date
@@ -26,18 +25,30 @@ export async function GET(request) {
     `;
 
     if (prizes.length === 0) {
-      return Response.json({ 
+      return new Response(JSON.stringify({ 
         success: false, 
         message: 'Prize nahi mila!' 
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    return Response.json({ success: true, prize: prizes[0] });
+    return new Response(JSON.stringify({ 
+      success: true, 
+      prize: prizes[0] 
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
-    return Response.json({ 
+    return new Response(JSON.stringify({ 
       success: false, 
       message: error.message 
-    }, { status: 500 });
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
