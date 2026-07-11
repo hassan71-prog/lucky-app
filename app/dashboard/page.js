@@ -94,6 +94,9 @@ export default function DashboardPage() {
           <Link href="/winners" style={{ background: '#ffd700', color: '#333', padding: '12px 20px', borderRadius: '10px', textDecoration: 'none', display: 'inline-block', margin: '5px' }}>
             🏆 Winners
           </Link>
+          <Link href="/tasks" style={{ background: '#ff6b35', color: '#fff', padding: '12px 20px', borderRadius: '10px', textDecoration: 'none', display: 'inline-block', margin: '5px', fontWeight: 'bold' }}>
+            📋 Tasks
+          </Link>
         </div>
 
         {/* Referral Section */}
