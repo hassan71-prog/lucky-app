@@ -17,9 +17,8 @@ function CardContent() {
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(1);
 
-  // Apna Easypaisa number yahan likho
   const easypaisaNumber = "03273003414";
-  const easypaisaLink = `easypaisa://mobile-account/send-money?msisdn=${easypaisaNumber}&amount=${prize?.card_amount}`;
+  const ibanNumber = "PK15TMFB0000000072267395";
 
   useEffect(() => {
     fetchPrize();
@@ -110,17 +109,31 @@ function CardContent() {
             {step === 1 && (
               <div style={{ background: '#fff', padding: '20px', borderRadius: '12px', marginBottom: '15px' }}>
                 <h3 style={{ marginBottom: '15px' }}>💳 Step 1: Payment Karein</h3>
-                <p style={{ color: '#666', marginBottom: '15px' }}>
-                  Rs. <strong>{prize.card_amount}</strong> pay karein:
-                </p>
 
-                {/* Easypaisa Button */}
-                <a href={easypaisaLink} target="_blank" rel="noreferrer"
-                  style={{ display: 'block', background: '#00a651', color: '#fff', padding: '15px', borderRadius: '10px', textAlign: 'center', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.1em', marginBottom: '10px' }}>
-                  📱 Easypaisa Se Pay Karein — Rs. {prize.card_amount}
-                </a>
+                {/* Easypaisa */}
+                <div style={{ background: '#e8f5e9', padding: '15px', borderRadius: '10px', marginBottom: '10px', border: '2px solid #00a651' }}>
+                  <h4 style={{ color: '#00a651', margin: '0 0 10px' }}>📱 Easypaisa Se Bhejein:</h4>
+                  <p style={{ margin: '5px 0' }}>📞 Number: <strong>{easypaisaNumber}</strong></p>
+                  <p style={{ color: '#666', fontSize: '0.85em', marginTop: '8px' }}>
+                    Tarika: Easypaisa app kholo → Send Money → Mobile Number → {easypaisaNumber} → Amount: Rs. {prize?.card_amount} → Send
+                  </p>
+                </div>
 
-                
+                {/* IBAN */}
+                <div style={{ background: '#e3f2fd', padding: '15px', borderRadius: '10px', marginBottom: '15px', border: '2px solid #1976d2' }}>
+                  <h4 style={{ color: '#1976d2', margin: '0 0 10px' }}>🏦 Bank Transfer (IBAN):</h4>
+                  <p style={{ margin: '5px 0', wordBreak: 'break-all' }}>IBAN: <strong>{ibanNumber}</strong></p>
+                  <p style={{ color: '#666', fontSize: '0.85em', marginTop: '8px' }}>
+                    Tarika: Apni banking app kholo → Fund Transfer → IBAN → {ibanNumber} → Amount: Rs. {prize?.card_amount} → Transfer
+                  </p>
+                </div>
+
+                {/* Screenshot Note */}
+                <div style={{ background: '#fff3cd', padding: '12px', borderRadius: '8px', marginBottom: '15px', border: '1px solid #ffc107' }}>
+                  <p style={{ margin: 0, color: '#856404', fontSize: '0.9em' }}>
+                    ⚠️ Payment ke baad <strong>screenshot zaroor lein</strong> — agla step mein TXN ID likhni hogi!
+                  </p>
+                </div>
 
                 <button onClick={() => setStep(2)}
                   style={{ width: '100%', padding: '13px', background: '#6c3fc5', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1em', cursor: 'pointer' }}>
@@ -147,11 +160,13 @@ function CardContent() {
                     <option value="">-- Select Karein --</option>
                     <option value="easypaisa">Easypaisa</option>
                     <option value="jazzcash">JazzCash</option>
+                    <option value="bank">Bank Transfer</option>
                   </select>
 
-                  <label style={{ fontWeight: 'bold' }}>Transaction ID (optional):</label>
-                  <input type="text" placeholder="TXN ID (agar mile to likhein)"
+                  <label style={{ fontWeight: 'bold' }}>Transaction ID:</label>
+                  <input type="text" placeholder="TXN ID likhein"
                     value={txnId} onChange={(e) => setTxnId(e.target.value)}
+                    required
                     style={{ width: '100%', padding: '12px', margin: '8px 0 16px', border: '1px solid #ddd', borderRadius: '8px', fontSize: '1em', boxSizing: 'border-box' }}
                   />
 
